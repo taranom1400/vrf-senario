@@ -1,0 +1,50 @@
+!
+hostname R5
+!
+vrf definition a
+ rd 0:600
+ route-target export 0:600
+ route-target import 0:600
+ address-family ipv4
+ exit-address-family
+!
+ip cef
+!
+interface Loopback0
+ ip address 5.5.5.5 255.255.255.255
+!
+interface GigabitEthernet3/0
+ vrf forwarding a
+ ip address 172.5.7.1 255.255.255.252
+ negotiation auto
+!
+interface Serial4/0
+ ip address 172.5.10.1 255.255.255.252
+ ip router isis 1
+ mpls ip
+ !
+router isis 1
+ net 49.0001.0000.0000.0000.0005.00
+ is-type level-1
+ advertise passive-only
+ passive-interface Loopback0
+!
+router bgp 1
+ no bgp default ipv4-unicast
+ bgp log-neighbor-changes
+ neighbor 1.1.1.1 remote-as 1
+ neighbor 1.1.1.1 update-source Loopback0
+ !
+ address-family vpnv4
+  neighbor 1.1.1.1 activate
+  neighbor 1.1.1.1 send-community extended
+ exit-address-family
+ !
+ address-family ipv4 vrf a
+  no synchronization
+  redistribute connected
+  neighbor 172.5.7.2 remote-as 3
+  neighbor 172.5.7.2 activate
+ exit-address-family
+!
+end
