@@ -1,0 +1,54 @@
+hostname R3
+!
+vrf definition b
+ rd 0:500
+ route-target export 0:500
+ route-target import 0:500
+ !
+ip cef
+!
+interface Loopback0
+ ip address 3.3.3.3 255.255.255.255
+!
+interface GigabitEthernet3/0
+ vrf forwarding b
+ ip address 172.3.8.1 255.255.255.252
+ negotiation auto
+!
+interface Serial4/0
+ ip address 172.1.3.2 255.255.255.252
+ ip router isis 1
+ mpls ip
+!
+router isis 1
+ net 49.0001.0000.0000.0000.0003.00
+ is-type level-1
+ advertise passive-only
+ passive-interface Loopback0
+!
+router bgp 1
+ no bgp default ipv4-unicast
+ bgp log-neighbor-changes
+ neighbor 1.1.1.1 remote-as 1
+ neighbor 1.1.1.1 update-source Loopback0
+ !
+ address-family ipv4
+  no synchronization
+  no auto-summary
+ exit-address-family
+ !
+ address-family vpnv4
+  neighbor 1.1.1.1 activate
+  neighbor 1.1.1.1 send-community extended
+ exit-address-family
+ !
+ address-family ipv4 vrf b
+  no synchronization
+  redistribute connected
+  redistribute static
+ exit-address-family
+!
+ip route vrf b 6.6.6.6 255.255.255.255 172.3.8.2
+!
+end
+
