@@ -1,0 +1,14 @@
+hostname R8//CE router - bgp neighbor with PE
+!
+ip cef
+!
+interface Loopback0
+ ip address 6.6.6.6 255.255.255.255
+!
+interface GigabitEthernet3/0
+ ip address 172.3.8.2 255.255.255.252
+!
+ip route 0.0.0.0 0.0.0.0 GigabitEthernet3/0
+
+end
+
