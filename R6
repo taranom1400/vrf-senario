@@ -1,0 +1,19 @@
+hostname R6//CE router - bgp neighbor with PE
+!
+ip cef
+!
+interface Loopback0
+ ip address 6.6.6.6 255.255.255.255
+!
+interface GigabitEthernet3/0
+ ip address 172.4.6.2 255.255.255.252
+ negotiation auto
+!
+router bgp 2
+ network 6.6.6.6 mask 255.255.255.255
+ network 172.4.6.0 mask 255.255.255.252
+ neighbor 172.4.6.1 remote-as 1
+ no auto-summary
+!
+end
+
